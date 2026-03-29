@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crichub Ultra</title>
+
+<link rel="manifest" href="manifest.json">
+
+<style>
+body {
+    margin:0;
+    font-family: 'Segoe UI', sans-serif;
+    background:#020617;
+    color:white;
+}
+
+header {
+    background:#16a34a;
+    padding:15px;
+    text-align:center;
+    font-size:22px;
+    font-weight:bold;
+}
+
+.container {
+    padding:10px;
+}
+
+.card {
+    background:#0f172a;
+    padding:15px;
+    border-radius:12px;
+    margin-bottom:12px;
+}
+
+.live { color:#22c55e; }
+
+.match {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.team {
+    display:flex;
+    align-items:center;
+}
+
+.team img {
+    width:28px;
+    margin-right:6px;
+}
+
+.btn {
+    display:block;
+    background:#22c55e;
+    padding:10px;
+    border-radius:8px;
+    text-align:center;
+    text-decoration:none;
+    color:black;
+}
+</style>
+</head>
+
+<body>
+
+<header>🏏 CRICHUB ULTRA</header>
+
+<div class="container">
+
+<!-- LIVE MATCH -->
+<div class="card">
+<h3 class="live">🔴 LIVE MATCH</h3>
+<div id="liveMatch">Loading...</div>
+</div>
+
+<!-- SCHEDULE -->
+<div class="card">
+<h3>📅 Matches</h3>
+<div id="schedule">Loading...</div>
+</div>
+
+<!-- POINT TABLE -->
+<div class="card">
+<h3>🏆 Points Table</h3>
+<div id="points">Loading...</div>
+</div>
+
+<!-- NEWS -->
+<div class="card">
+<h3>📰 News</h3>
+<p>Auto cricket news coming soon...</p>
+</div>
+
+<!-- STREAM -->
+<div class="card">
+<h3>📺 Watch Live</h3>
+<a class="btn" href="https://www.hotstar.com" target="_blank">
+Watch on JioHotstar
+</a>
+</div>
+
+</div>
+
+<script>
+const API_KEY = "YOUR_API_KEY";
+
+// LIVE MATCH
+async function loadLive() {
+    let res = await fetch(`https://api.cricapi.com/v1/currentMatches?apikey=${API_KEY}`);
+    let data = await res.json();
+
+    let match = data.data[0];
+
+    document.getElementById("liveMatch").innerHTML = `
+    <div class="match">
+        <div class="team">
+            <img src="https://via.placeholder.com/30">
+            ${match.teams[0]}
+        </div>
+        <div>
+            ${match.score[0].r}/${match.score[0].w}
+        </div>
+        <div class="team">
+            <img src="https://via.placeholder.com/30">
+            ${match.teams[1]}
+        </div>
+    </div>`;
+}
+
+// SCHEDULE
+async function loadSchedule() {
+    let res = await fetch(`https://api.cricapi.com/v1/matches?apikey=${API_KEY}`);
+    let data = await res.json();
+
+    let html = "";
+    data.data.slice(0,5).forEach(m => {
+        html += `<p>${m.teams[0]} vs ${m.teams[1]}</p>`;
+    });
+
+    document.getElementById("schedule").innerHTML = html;
+}
+
+// POINT TABLE (dummy for now)
+function loadPoints() {
+    document.getElementById("points").innerHTML = `
+    <p>1. MI</p>
+    <p>2. CSK</p>
+    <p>3. RCB</p>
+    `;
+}
+
+// LOAD ALL
+loadLive();
+loadSchedule();
+loadPoints();
+
+// AUTO REFRESH
+setInterval(loadLive, 10000);
+</script>
+
+</body>
+</html>
