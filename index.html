@@ -109,7 +109,7 @@ const API_KEY = "<script src="https://api.cricapi.com/v1/cricScore?apikey=[428c3
 
 // LIVE MATCH
 async function loadLive() {
-    let res = await fetch(`https://api.cricapi.com/v1/currentMatches?apikey=${API_KEY}`);
+    let res = await fetch(`https://api.cricapi.com/v1/currentMatches?apikey=${428c39de-45e3-4a4e-bae8-}`);
     let data = await res.json();
 
     let match = data.data[0];
@@ -132,7 +132,7 @@ async function loadLive() {
 
 // SCHEDULE
 async function loadSchedule() {
-    let res = await fetch(`https://api.cricapi.com/v1/matches?apikey=${API_KEY}`);
+    let res = await fetch(`https://api.cricapi.com/v1/matches?apikey=${428c39de-45e3-4a4e-bae8-}`);
     let data = await res.json();
 
     let html = "";
