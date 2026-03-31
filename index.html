@@ -1,164 +1,239 @@
 <!DOCTYPE html>
 <html>
 <head>
+<title>Crichub</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Crichub Ultra</title>
-
-<link rel="manifest" href="manifest.json">
 
 <style>
 body {
-    margin:0;
-    font-family: 'Segoe UI', sans-serif;
-    background:#020617;
-    color:white;
+  margin:0;
+  font-family: Arial;
+  background:#0f172a;
+  color:white;
 }
 
+/* Header */
 header {
-    background:#16a34a;
-    padding:15px;
-    text-align:center;
-    font-size:22px;
-    font-weight:bold;
+  background:#020617;
+  padding:15px;
+  text-align:center;
+  font-size:20px;
+  font-weight:bold;
 }
 
-.container {
-    padding:10px;
+/* Sections */
+<script>
+let currentTab = "live";
+
+function showTab(tab, el=null) {
+  document.getElementById('live').style.display = 'none';
+  document.getElementById('schedule').style.display = 'none';
+  document.getElementById('points').style.display = 'none';
+
+  document.getElementById(tab).style.display = 'block';
+  currentTab = tab;
+
+  let buttons = document.querySelectorAll('.bottom-nav button');
+  buttons.forEach(btn => btn.classList.remove('active'));
+  if(el) el.classList.add('active');
 }
 
+/* Swipe support */
+let startX = 0;
+
+document.addEventListener("touchstart", e => {
+  startX = e.touches[0].clientX;
+});
+
+document.addEventListener("touchend", e => {
+  let endX = e.changedTouches[0].clientX;
+
+  if(startX - endX > 50) {
+    if(currentTab === "live") showTab("schedule");
+    else if(currentTab === "schedule") showTab("points");
+  }
+
+  if(endX - startX > 50) {
+    if(currentTab === "points") showTab("schedule");
+    else if(currentTab === "schedule") showTab("live");
+  }
+});
+
+/* Install App */
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+
+  let installBtn = document.createElement("button");
+  installBtn.innerText = "📲 Install App";
+  installBtn.style.position = "fixed";
+  installBtn.style.bottom = "80px";
+  installBtn.style.left = "50%";
+  installBtn.style.transform = "translateX(-50%)";
+  installBtn.style.padding = "10px 20px";
+  installBtn.style.background = "#22c55e";
+  installBtn.style.border = "none";
+  installBtn.style.borderRadius = "8px";
+  installBtn.style.color = "white";
+
+  document.body.appendChild(installBtn);
+
+  installBtn.onclick = () => {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(() => {
+      installBtn.remove();
+    });
+  };
+});
+</script>
+
+/* Cards */
 .card {
-    background:#0f172a;
-    padding:15px;
-    border-radius:12px;
-    margin-bottom:12px;
+  background:#1e293b;
+  padding:15px;
+  border-radius:12px;
+  margin-bottom:12px;
+  animation: fadeIn 0.4s ease;
 }
 
-.live { color:#22c55e; }
-
-.match {
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
+@keyframes fadeIn {
+  from {opacity:0; transform:translateY(10px);}
+  to {opacity:1; transform:translateY(0);}
 }
 
 .team {
-    display:flex;
-    align-items:center;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
 
 .team img {
-    width:28px;
-    margin-right:6px;
+  width:28px;
 }
 
-.btn {
-    display:block;
-    background:#22c55e;
-    padding:10px;
-    border-radius:8px;
-    text-align:center;
-    text-decoration:none;
-    color:black;
+.score {
+  text-align:center;
+  color:#22c55e;
+  font-size:18px;
+  margin-top:8px;
+}
+
+/* Bottom Nav */
+.bottom-nav {
+  position:fixed;
+  bottom:0;
+  width:100%;
+  display:flex;
+  background:#020617;
+}
+
+.bottom-nav button {
+  flex:1;
+  padding:12px;
+  background:none;
+  border:none;
+  color:white;
+  font-size:14px;
+}
+
+.bottom-nav button.active {
+  color:#22c55e;
 }
 </style>
+
 </head>
 
 <body>
 
-<header>🏏 CRICHUB ULTRA</header>
+<header>🏏 CRICHUB</header>
 
-<div class="container">
+<!-- LIVE -->
+async function loadLive() {
+  try {
+    let res = await fetch("https://api.allorigins.win/raw?url=https://cricapi.com/api/matches");
+    let data = await res.json();
 
-<!-- LIVE MATCH -->
-<div class="card">
-<h3 class="live">🔴 LIVE MATCH</h3>
-<div id="liveMatch">Loading...</div>
+    let match = data.matches[0];
+
+    document.getElementById("live").innerHTML = `
+    <div class="card">
+      <div class="team">
+        <div>${match.team-1}</div>
+        <div>VS</div>
+        <div>${match.team-2}</div>
+      </div>
+      <div class="score">Live match data loaded</div>
+    </div>`;
+    
+  } catch {
+    document.getElementById("live").innerHTML = `
+    <div class="card">Live data not available</div>`;
+  }
+}
+
+loadLive();
+<div id="live" class="section">
+
+  <div class="card">
+    <div class="team">
+      <div><img src="https://upload.wikimedia.org/wikipedia/en/2/2e/Mumbai_Indians_Logo.svg"> MI</div>
+      <div>VS</div>
+      <div>KKR <img src="https://upload.wikimedia.org/wikipedia/en/4/4a/Kolkata_Knight_Riders_Logo.svg"></div>
+    </div>
+    <div class="score">167/4 (18.2 ov)</div>
+  </div>
+
+  <div class="card">
+    <div class="team">
+      <div><img src="https://upload.wikimedia.org/wikipedia/en/2/2b/Chennai_Super_Kings_Logo.svg"> CSK</div>
+      <div>VS</div>
+      <div>RCB <img src="https://upload.wikimedia.org/wikipedia/en/4/4b/Royal_Challengers_Bangalore_Logo.svg"></div>
+    </div>
+    <div class="score">142/6 (16.4 ov)</div>
+  </div>
+
 </div>
 
 <!-- SCHEDULE -->
-<div class="card">
-<h3>📅 Matches</h3>
-<div id="schedule">Loading...</div>
+<div id="schedule" class="section" style="display:none;">
+  <div class="card">GT 🆚 PBXI - Today 7:30 PM</div>
+  <div class="card">LSG 🆚 DC - Tomorrow </div>
 </div>
 
-<!-- POINT TABLE -->
-<div class="card">
-<h3>🏆 Points Table</h3>
-<div id="points">Loading...</div>
+<!-- POINTS -->
+<div id="points" class="section" style="display:none;">
+  <div class="card">1. RR - 2 pts</div>
+  <div class="card">2. RCB - 2 pts</div>
+  <div class="card">3. MI - 2 pts</div>
+  <div class="card">4. GT - 0 pts</div>
+  <div class="card">6. LSG - 0 pts</div>
+  <div class="card">7. PBKS - 0 pts</div>
+  <div class="card">8. KKR - 0 pts</div>
+  <div class="card">9. SRH - 0 pts</div> 
+  <div class="card">10. CSK - 0 pts</div>
 </div>
 
-<!-- NEWS -->
-<div class="card">
-<h3>📰 News</h3>
-<p>Auto cricket news coming soon...</p>
-</div>
-
-<!-- STREAM -->
-<div class="card">
-<h3>📺 Watch Live</h3>
-<a class="btn" href="https://cricxcrate-star-sports-1hindi.pages.dev/" target="_blank">
-Watch on JioHotstar
-</a>
-</div>
-
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button onclick="showTab('live', this)" class="active">🏏 Live</button>
+  <button onclick="showTab('schedule', this)">📅 Schedule</button>
+  <button onclick="showTab('points', this)">🏆 Points</button>
 </div>
 
 <script>
-const API_KEY = "<script src="https://api.cricapi.com/v1/cricScore?apikey=[428c39de-45e3-4a4e-bae8-]"></script>”;
-    
+function showTab(tab, el) {
+  document.getElementById('live').style.display = 'none';
+  document.getElementById('schedule').style.display = 'none';
+  document.getElementById('points').style.display = 'none';
 
-// LIVE MATCH
-async function loadLive() {
-    let res = await fetch(`https://api.cricapi.com/v1/currentMatches?apikey=${428c39de-45e3-4a4e-bae8-}`);
-    let data = await res.json();
+  document.getElementById(tab).style.display = 'block';
 
-    let match = data.data[0];
-
-    document.getElementById("liveMatch").innerHTML = `
-    <div class="match">
-        <div class="team">
-            <img src="https://via.placeholder.com/30">
-            ${match.teams[0]}
-        </div>
-        <div>
-            ${match.score[0].r}/${match.score[0].w}
-        </div>
-        <div class="team">
-            <img src="https://via.placeholder.com/30">
-            ${match.teams[1]}
-        </div>
-    </div>`;
+  let buttons = document.querySelectorAll('.bottom-nav button');
+  buttons.forEach(btn => btn.classList.remove('active'));
+  el.classList.add('active');
 }
-
-// SCHEDULE
-async function loadSchedule() {
-    let res = await fetch(`https://api.cricapi.com/v1/matches?apikey=${428c39de-45e3-4a4e-bae8-}`);
-    let data = await res.json();
-
-    let html = "";
-    data.data.slice(0,5).forEach(m => {
-        html += `<p>${m.teams[0]} vs ${m.teams[1]}</p>`;
-    });
-
-    document.getElementById("schedule").innerHTML = html;
-}
-
-// POINT TABLE (dummy for now)
-function loadPoints() {
-    document.getElementById("points").innerHTML = `
-    <p>1. MI</p>
-    <p>2. CSK</p>
-    <p>3. RCB</p>
-    `;
-}
-
-// LOAD ALL
-loadLive();
-loadSchedule();
-loadPoints();
-
-// AUTO REFRESH
-setInterval(loadLive, 10000);
 </script>
 
 </body>
