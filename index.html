@@ -150,6 +150,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
 <header>🏏 CRICHUB</header>
 
 <!-- LIVE -->
+<script>
 async function loadLive() {
   try {
     let res = await fetch("https://api.allorigins.win/raw?url=https://cricapi.com/api/matches");
@@ -160,9 +161,9 @@ async function loadLive() {
     document.getElementById("live").innerHTML = `
     <div class="card">
       <div class="team">
-        <div>${match.team-1}</div>
+        <div>${match["team-1"]}</div>
         <div>VS</div>
-        <div>${match.team-2}</div>
+        <div>${match["team-2"]}</div>
       </div>
       <div class="score">Live match data loaded</div>
     </div>`;
@@ -173,6 +174,8 @@ async function loadLive() {
   }
 }
 
+loadLive();
+</script>
 loadLive();
 <div id="live" class="section">
 
